@@ -13,7 +13,7 @@ This reduces the final image's contents and removes build-only tools from the ru
 
 ## 2. Stable Node.js base image
 
-The Node.js build and API stages use the official `node:24-alpine` image. Node 24 is an LTS major line. Alpine provides a smaller base, while using the same Node major in build and runtime stages helps avoid native-module ABI mismatches.
+The API dependency and runtime stages use the official `node:24-bookworm-slim` image; the customer and admin build stages use `node:24-alpine`. Node 24 is an LTS major line. The API uses the same Debian-based Node image family in both stages to avoid native-module ABI mismatches.
 
 For repeatable supply-chain builds, production pipelines should pin base images by digest and update those digests through a regular security-update process. Tags can receive updated patch releases.
 
