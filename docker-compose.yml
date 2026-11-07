@@ -78,7 +78,8 @@ services:
     ports:
       - "3002:8080"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=32m
