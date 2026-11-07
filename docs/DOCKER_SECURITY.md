@@ -65,10 +65,11 @@ Check the runtime user and effective container settings:
 docker compose exec backend id
 docker inspect food-delivery-backend --format '{{.Config.User}}'
 docker inspect food-delivery-frontend --format '{{.HostConfig.ReadonlyRootfs}}'
+docker inspect food-delivery-admin --format '{{.Config.User}}'
 docker inspect food-delivery-backend --format '{{json .HostConfig.CapDrop}}'
 ```
 
-The backend should report a non-root UID (the Node image's `node` user), frontend/admin use UID 101, read-only root filesystem should be `true`, and capabilities should be dropped.
+The backend should report a non-root UID (the Node image's `node` user), frontend/admin use UID 101, read-only root filesystem should be `true`, and capabilities should be dropped. Compose also waits for MongoDB and the API health checks before starting dependent services.
 
 ## 7. Image size comparison
 
