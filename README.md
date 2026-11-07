@@ -98,6 +98,35 @@ npm run lint
 
 The customer and admin applications each have their own Vite build.
 
+## Task 5 — Secure Docker Builds & Container Hardening
+
+Task 5 adds production-focused Docker improvements across the customer frontend, admin dashboard and API:
+
+- Multi-stage builds separate compilation/dependency installation from runtime.
+- Node.js API uses the official Node 24 LTS Bookworm Slim image and runs as the built-in non-root `node` user.
+- Customer and admin apps build with Node 24 and run as UID 101 on unprivileged Nginx (port 8080).
+- Docker Compose drops Linux capabilities, enables `no-new-privileges`, uses read-only root filesystems and limits writable temporary storage.
+- Nginx proxies `/api` and `/images` to the internal backend, so browser clients use same-origin API paths.
+- MongoDB and uploaded files use persistent named volumes.
+
+See [Docker Security & Multi-Stage Build Guide](docs/DOCKER_SECURITY.md) for concepts, commands and verification steps.
+
+### Start the production-style stack
+
+Create `backend/.env` locally with the secrets required by your API. Keep it out of Git.
+
+```bash
+docker compose config
+docker compose build --pull
+docker compose up -d
+docker compose ps
+```
+
+- Customer app: http://localhost:3001
+- Admin app: http://localhost:3002
+
+The Node containers run as non-root users. This is container-level least privilege; enabling Docker Engine Rootless Mode on the host is a separate host configuration step.
+
 ## Docker
 
 The root Compose file starts the services configured in the repository. Add local environment values before running:
