@@ -25,7 +25,7 @@ Task 5 introduces a fresh, premium visual system across the customer application
 ### Stability approach
 - Existing business logic and API integration are intentionally retained.
 - No new runtime dependency is required for the visual refresh.
-- Existing backend, Docker and payment configuration are not replaced.
+- Existing backend API, database and payment workflows are preserved; Task 5 upgrades the Docker deployment and runtime security.
 - Motion respects the user's reduced-motion preference.
 
 ## Project structure
