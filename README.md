@@ -1,212 +1,120 @@
-# TOMATO — Food Delivery Platform
+# TOMATO — Modern Food Delivery Platform
 
-A full-stack food ordering application built with the **MERN stack**. Customers can browse food, add items to their cart, place orders and make payments. Administrators can manage food items and update order statuses.
+A full-stack food ordering platform built with React, Vite, Node.js, Express and MongoDB. The project includes a customer storefront, an operations dashboard and a REST API.
 
-> This repository contains three application parts: the customer frontend, admin dashboard and Express backend.
+## Task 5 — Complete UI Refresh
 
-## Live Demo
+Branch: `feature/Task5` (created from `feature/Task4`).
 
-- **Customer website:** https://food-delivery-frontend-s2l9.onrender.com/
-- **Admin dashboard:** https://food-delivery-admin-wrme.onrender.com/
+Task 5 introduces a fresh, premium visual system across the customer application and admin dashboard while preserving the existing React components, routes, API calls and ordering workflows.
 
-## Highlights
-
-### Customer experience
-- Browse food items and explore menu categories
-- Add and remove items from the shopping cart
-- Sign up, sign in and log out
-- Place food orders and view order history
-- Responsive storefront styling for desktop and mobile
+### Customer storefront
+- Refined responsive navigation with a translucent sticky header.
+- Large editorial-style hero section with layered overlays and entrance motion.
+- Updated category browser with horizontal scrolling and active-state feedback.
+- Elevated food cards with image zoom, depth, hover transitions and clearer pricing.
+- Refreshed cart, checkout, order history, login modal and footer styling.
+- Mobile-first layouts and reduced-motion accessibility support.
 
 ### Admin dashboard
-- Admin login and protected management views
-- Add food items with images, descriptions, prices and categories
-- View and remove food items
-- View customer orders and update order status
+- Updated workspace shell, navigation and sidebar.
+- Refined food creation form, upload field, food listing and order cards.
+- Clearer hierarchy, consistent form controls and responsive layouts.
+- Lightweight entrance and hover animations.
 
-### Backend and security
-- REST API built with Node.js and Express
-- MongoDB database with Mongoose
-- JWT-based authentication
-- Password hashing with bcrypt
-- Image uploads with Multer
-- Stripe payment integration
-- Request validation and protected API routes
+### Stability approach
+- Existing business logic and API integration are intentionally retained.
+- No new runtime dependency is required for the visual refresh.
+- Existing backend, Docker and payment configuration are not replaced.
+- Motion respects the user's reduced-motion preference.
 
-## Tech Stack
-
-| Area | Technologies |
-|---|---|
-| Customer frontend | React, Vite, React Router, Axios |
-| Admin dashboard | React, Vite, React Router, Axios |
-| Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
-| Authentication | JSON Web Tokens (JWT), bcrypt |
-| Payments | Stripe |
-| Uploads | Multer |
-| Containerization | Docker, Docker Compose |
-
-## Repository Structure
+## Project structure
 
 ```text
 Food-delivery/
-├── admin/                 # Admin dashboard (React + Vite)
-├── backend/               # REST API (Node.js + Express)
-├── frontend/              # Customer website (React + Vite)
-├── docker-compose.yml      # MongoDB, backend and customer frontend
+├── frontend/          # Customer React + Vite application
+├── admin/             # Admin React + Vite dashboard
+├── backend/           # Express REST API
+├── docker-compose.yml
 └── README.md
 ```
 
-## Run Locally
+## Technology
 
-### 1. Requirements
+| Layer | Stack |
+|---|---|
+| Customer UI | React 18, Vite, React Router |
+| Admin UI | React 18, Vite, React Router |
+| API | Node.js, Express |
+| Database | MongoDB, Mongoose |
+| Authentication | JWT, bcrypt |
+| Payments | Stripe |
+| Uploads | Multer |
+| Containers | Docker, Docker Compose |
 
-Install the following before starting:
+## Run locally
 
-- Node.js 20 or later
-- npm
-- MongoDB (local installation or MongoDB Atlas)
-- Git
-
-### 2. Clone the repository
+Requirements: Node.js 20+, npm and a MongoDB database.
 
 ```bash
 git clone https://github.com/nasirbloch323/Food-delivery.git
 cd Food-delivery
+git checkout feature/Task5
 ```
 
-To use the Task 4 development branch:
-
-```bash
-git checkout feature/Task4
-```
-
-### 3. Configure backend environment
-
-Create a file named `.env` inside the `backend/` directory:
-
-```env
-JWT_SECRET=replace_with_a_long_random_secret
-SALT=10
-MONGO_URL=mongodb://127.0.0.1:27017/food-delivery
-STRIPE_SECRET_KEY=your_stripe_secret_key
-```
-
-Use your own database connection string and Stripe secret key. Never commit real credentials or production secrets to GitHub.
-
-### 4. Install dependencies
-
-Open separate terminal windows for each application.
+Install and start each service in its own terminal:
 
 **Backend**
-
 ```bash
 cd backend
 npm install
 npm run server
 ```
 
-**Customer frontend**
-
+**Customer app**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-**Admin dashboard**
-
+**Admin app**
 ```bash
 cd admin
 npm install
 npm run dev
 ```
 
-Vite prints the local development URL for each frontend in its terminal. Open those URLs in your browser.
+Configure the backend environment variables in a local `backend/.env` file. Never commit real credentials, payment keys or database passwords.
 
-### 5. Configure API URLs
+## Build checks
 
-Make sure both React applications point to the URL where your backend is running. Update the API base URL in the frontend and admin application configuration/context files as required by the project.
+Run from the corresponding application directory:
 
-For local development, the backend normally runs on:
-
-```text
-http://localhost:4000
+```bash
+npm run build
+npm run lint
 ```
 
-Also set the frontend return URL used by the backend order/payment flow to the correct customer frontend address.
+The customer and admin applications each have their own Vite build.
 
-## Run with Docker Compose
+## Docker
 
-The included Compose file starts MongoDB, the backend API and the customer frontend.
-
-1. Create `backend/.env` and add the required secrets described above.
-2. From the repository root, run:
+The root Compose file starts the services configured in the repository. Add local environment values before running:
 
 ```bash
 docker compose up --build
 ```
 
-To stop the containers:
+Stop containers with `docker compose down`. Avoid `docker compose down -v` unless you intentionally want to remove persisted volumes.
 
-```bash
-docker compose down
-```
+## Live deployments
 
-To stop containers and also delete the MongoDB and uploaded-file volumes (this permanently deletes that persisted data):
+- Customer: https://food-delivery-frontend-s2l9.onrender.com/
+- Admin: https://food-delivery-admin-wrme.onrender.com/
 
-```bash
-docker compose down -v
-```
-
-The Compose setup exposes MongoDB on port `27017`, the backend on port `4000` and the customer frontend on port `3001`. The admin dashboard is not included in the current Compose services; run it separately using the local instructions above.
-
-## Useful Development Commands
-
-Run these commands from the relevant application directory:
-
-| Application | Command | Purpose |
-|---|---|---|
-| Backend | `npm run server` | Start API with nodemon |
-| Frontend | `npm run dev` | Start customer Vite server |
-| Frontend | `npm run build` | Create production build |
-| Admin | `npm run dev` | Start admin Vite server |
-| Admin | `npm run build` | Create production build |
-
-## UI Refresh — Task 4
-
-The `feature/Task4` branch includes a refreshed visual style for both React interfaces:
-
-- Customer storefront: updated typography, navigation, hero section, category browsing, food cards and footer.
-- Admin dashboard: refreshed navigation, sidebar, forms, food listing and order-management layouts.
-- Responsive CSS adjustments for smaller screens.
-
-The existing application components and API workflows are retained while the interface styling is updated.
-
-## Screenshots
-
-Add updated screenshots of the customer website and admin dashboard here after running the applications locally.
-
-## Deployment
-
-The live demo links above are hosted on Render. For your own deployment:
-
-1. Provision a MongoDB database.
-2. Configure backend environment variables securely in your hosting provider.
-3. Deploy the backend and set the correct frontend/backend URLs.
-4. Build and deploy the customer frontend and admin dashboard.
-5. Configure Stripe keys and allowed frontend URLs for the payment flow.
-
-Do not expose private environment variables in frontend code.
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Make and test your changes.
-4. Open a pull request with a clear description.
+Deployment availability depends on the hosting provider and configured environment variables.
 
 ## Maintainer
 
-**Nasir Mehmood**  
-GitHub: [@nasirbloch323](https://github.com/nasirbloch323)
+**Nasir Mehmood** · [GitHub @nasirbloch323](https://github.com/nasirbloch323)
