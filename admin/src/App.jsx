@@ -11,7 +11,7 @@ import Login from "./components/Login/Login";
 import "./redesign.css";
 
 const App = () => {
-  const url = import.meta.env.VITE_API_URL || "";
+  const url = import.meta.env.VITE_API_URL ?? "https://food-delivery-backend-5b6g.onrender.com";
   return (
     <div>
       <ToastContainer />
