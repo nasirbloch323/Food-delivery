@@ -1,35 +1,85 @@
 services:
   mongodb:
     image: mongo:7
-    container_name: mongodb
-    ports:
-      - "27017:27017"
+    container_name: food-delivery-mongodb
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   backend:
-    build: ./backend
-    container_name: backend
-    ports:
-      - "4000:4000"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: food-delivery-backend
     env_file:
       - ./backend/.env
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/food-delivery
+      NODE_ENV: production
+      PORT: 4000
+      MONGO_URL: mongodb://mongodb:27017/food-delivery
+    expose:
+      - "4000"
     volumes:
       - backend-uploads:/app/uploads
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 100
+    init: true
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
-    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ""
+    container_name: food-delivery-frontend
     ports:
-      - "3001:3001"
+      - "3001:8080"
     depends_on:
       - backend
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 100
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ""
+    container_name: food-delivery-admin
+    ports:
+      - "3002:8080"
+    depends_on:
+      - backend
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 100
     restart: unless-stopped
 
 volumes:
