@@ -29,14 +29,14 @@ pipeline {
         stage('Validate Compose') {
             steps {
                 // Check that the Compose file is valid before building images.
-                sh 'docker compose -f task6/docker-compose.yml config --quiet'
+                sh 'docker compose -f docker-compose.yml config --quiet'
             }
         }
 
         stage('Test Backend') {
             steps {
                 // Install backend dependencies and run the built-in Node test suite.
-                dir('task6/backend') {
+                dir('backend') {
                     sh 'npm install'
                     sh 'npm test'
                 }
@@ -46,9 +46,9 @@ pipeline {
         stage('Build Images') {
             steps {
                 // Build and tag the frontend image with a unique build number and latest.
-                sh 'docker build -t $FRONTEND_IMAGE:$IMAGE_TAG -t $FRONTEND_IMAGE:latest task6/frontend'
+                sh 'docker build -t $FRONTEND_IMAGE:$IMAGE_TAG -t $FRONTEND_IMAGE:latest frontend'
                 // Build and tag the backend image with a unique build number and latest.
-                sh 'docker build -t $BACKEND_IMAGE:$IMAGE_TAG -t $BACKEND_IMAGE:latest task6/backend'
+                sh 'docker build -t $BACKEND_IMAGE:$IMAGE_TAG -t $BACKEND_IMAGE:latest backend'
             }
         }
 
@@ -82,11 +82,11 @@ pipeline {
                 // Pass the Docker Hub image owner and build number into Compose.
                 withEnv(["DOCKERHUB_USER=$DOCKERHUB_USER", "IMAGE_TAG=$IMAGE_TAG"]) {
                     // Pull the exact images just published by the previous stage.
-                    sh 'docker compose -f task6/docker-compose.yml pull'
+                    sh 'docker compose -f docker-compose.yml pull'
                     // Start the database, API and frontend as a single application.
-                    sh 'docker compose -f task6/docker-compose.yml up -d --remove-orphans'
+                    sh 'docker compose -f docker-compose.yml up -d --remove-orphans'
                     // Print service state for deployment verification.
-                    sh 'docker compose -f task6/docker-compose.yml ps'
+                    sh 'docker compose -f docker-compose.yml ps'
                 }
             }
         }
@@ -106,7 +106,7 @@ pipeline {
     post {
         always {
             // Show recent logs to make deployment failures easier to diagnose.
-            sh 'docker compose -f task6/docker-compose.yml logs --tail=50 || true'
+            sh 'docker compose -f docker-compose.yml logs --tail=50 || true'
             // Remove dangling layers without deleting database volumes.
             sh 'docker image prune -f'
         }
