@@ -246,6 +246,29 @@ sudo systemctl enable --now jenkins
 sudo systemctl status jenkins
 ```
 
+Jenkins and the demo website both commonly use port 8080. To run both on the same EC2 instance, move Jenkins to port 8081 and keep the FoodExpress website on port 8080:
+
+```bash
+sudo systemctl edit jenkins
+```
+
+Add this systemd override:
+
+```ini
+[Service]
+Environment="JENKINS_PORT=8081"
+```
+
+Then reload systemd and restart Jenkins:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart jenkins
+```
+
+Open Jenkins at `http://EC2-PUBLIC-IP:8081` and allow TCP 8081 only from your trusted administrator IP. Allow TCP 8080 for the FoodExpress website according to your access requirements. If your Jenkins package uses a different port configuration, verify its service unit before applying the override.
+```
+
 Open `http://EC2-PUBLIC-IP:8080` and retrieve the initial administrator password:
 
 ```bash
