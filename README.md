@@ -143,7 +143,7 @@ docker compose logs -f
 ### Step 5 — Open and test
 
 - Website: `http://localhost:8080`
-- Backend health: `http://localhost:5000/health`
+- Backend health: `http://localhost:8080/api/health`
 - Menu API: `http://localhost:8080/api/foods`
 
 Select a food item and place a demo order. A successful response confirms that the API has stored the order in MongoDB.
@@ -371,7 +371,7 @@ curl http://localhost:8080/api/foods
 Create a demo order from the command line:
 
 ```bash
-curl -X POST http://localhost:5000/api/orders \
+curl -X POST http://localhost:8080/api/orders \
   -H "Content-Type: application/json" \
   -d '{"foodId":"classic-burger","quantity":2}'
 ```
