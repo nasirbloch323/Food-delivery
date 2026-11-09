@@ -48,7 +48,7 @@ A fresh, beginner-friendly food ordering demo built to practise a complete CI/CD
 | Service | Container port | Host port | Purpose |
 |---|---:|---:|---|
 | Frontend | 80 | 8080 | Website |
-| Backend | 5000 | 5000 | REST API |
+| Backend | 5000 | Internal only | REST API |
 | MongoDB | 27017 | Internal only | Persistent order storage |
 
 The frontend is served by Nginx. The backend is a Node.js/Express API. MongoDB is reachable by the backend through the Compose service name `mongo`, not through localhost.
@@ -145,7 +145,7 @@ docker compose logs -f
 
 - Website: `http://localhost:8080`
 - Backend health: `http://localhost:5000/health`
-- Menu API: `http://localhost:5000/api/foods`
+- Menu API: `http://localhost:8080/api/foods`
 
 Select a food item and place a demo order. A successful response confirms that the API has stored the order in MongoDB.
 
@@ -342,8 +342,8 @@ docker compose ps
 Check the API:
 
 ```bash
-curl http://localhost:5000/health
-curl http://localhost:5000/api/foods
+curl http://localhost:8080/api/health
+curl http://localhost:8080/api/foods
 ```
 
 Create a demo order from the command line:
@@ -371,7 +371,7 @@ Expected flow: browser requests menu from backend; backend reads menu data; chec
 | Problem | Checks and solution |
 |---|---|
 | Website does not open | Check EC2 security group, port 8080 mapping and `docker compose logs frontend` |
-| API is unreachable | Check port 5000, backend health and `docker compose logs backend` |
+| API is unreachable | Check the Nginx API proxy, backend health and `docker compose logs backend` |
 | MongoDB connection fails | Check MongoDB health and ensure backend uses `mongodb://mongo:27017/foodexpress` |
 | Docker permission denied in Jenkins | Add Jenkins to Docker group, restart Jenkins and verify agent permissions |
 | Docker Hub push denied | Check credential ID `dockerhub-creds`, username, token and repository names |
