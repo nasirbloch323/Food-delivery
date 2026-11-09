@@ -1,4 +1,4 @@
-# FoodExpress — Task 6
+# FoodExpress — Task 6 Mise Academy
 ### Docker • Docker Compose • Jenkins • Docker Hub • GitHub Webhook
 
 A fresh, beginner-friendly food ordering demo built to practise a complete CI/CD workflow. The frontend loads menu items from a Node.js API, the API stores demo orders in MongoDB, Docker packages the services, Docker Hub stores the application images, and Jenkins automates build, push and deployment.
