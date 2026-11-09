@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
     # Publish only Nginx to the EC2 host.
     ports:
-      - "8080:80"
+      - "8081:80"
     # Start the backend before the frontend.
     depends_on:
       backend:
