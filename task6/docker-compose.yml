@@ -18,6 +18,8 @@ services:
 
   # The backend exposes menu and order REST endpoints to the private Compose network.
   backend:
+    # Build from the backend Dockerfile for a first local run with --build.
+    build: ./backend
     # Use the image built and published by the Jenkins pipeline.
     image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-backend:${IMAGE_TAG:-latest}
     # Restart the API if it exits unexpectedly.
@@ -39,6 +41,8 @@ services:
 
   # Nginx serves the frontend and proxies /api requests to the backend.
   frontend:
+    # Build from the frontend Dockerfile for a first local run with --build.
+    build: ./frontend
     # Use the image built and published by Jenkins.
     image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-frontend:${IMAGE_TAG:-latest}
     # Restart the website container after host restarts.
