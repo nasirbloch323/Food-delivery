@@ -1,6 +1,6 @@
 # Define the services that make up the FoodExpress application.
 services:
-  # The MongoDB database stores customer demo orders.
+  # MongoDB stores customer demo orders.
   mongo:
     # Pull the official MongoDB image from Docker Hub.
     image: mongo:7
@@ -16,7 +16,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # The backend exposes menu and order REST endpoints.
+  # The backend exposes menu and order REST endpoints to the private Compose network.
   backend:
     # Use the image built and published by the Jenkins pipeline.
     image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-backend:${IMAGE_TAG:-latest}
@@ -26,9 +26,6 @@ services:
     environment:
       PORT: 5000
       MONGO_URL: mongodb://mongo:27017/foodexpress
-    # Publish the API port for local testing and browser access.
-    ports:
-      - "5000:5000"
     # Wait until the database health check succeeds.
     depends_on:
       mongo:
@@ -40,13 +37,13 @@ services:
       timeout: 5s
       retries: 5
 
-  # Nginx serves the frontend website to the browser.
+  # Nginx serves the frontend and proxies /api requests to the backend.
   frontend:
     # Use the image built and published by Jenkins.
     image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-frontend:${IMAGE_TAG:-latest}
     # Restart the website container after host restarts.
     restart: unless-stopped
-    # Publish the website on port 8080 of the EC2 host.
+    # Publish only Nginx to the EC2 host.
     ports:
       - "8080:80"
     # Start the backend before the frontend.
