@@ -1,0 +1,125 @@
+// Use a declarative pipeline so every build stage is visible in Jenkins.
+pipeline {
+    // Run this pipeline on any Jenkins agent with Docker and Compose installed.
+    agent any
+
+    // Keep Docker Hub credentials and image tags configurable in Jenkins.
+    environment {
+        // Replace this value with your Docker Hub username in Jenkins configuration.
+        DOCKERHUB_USER = 'nasirbloch323'
+        // Build a unique image tag from the Jenkins build number.
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        // Store the fully qualified image names for both application services.
+        FRONTEND_IMAGE = "${DOCKERHUB_USER}/foodexpress-frontend"
+        BACKEND_IMAGE = "${DOCKERHUB_USER}/foodexpress-backend"
+    }
+
+    // Run the pipeline when Jenkins receives a GitHub push webhook.
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Pull the current feature branch source code from GitHub.
+                checkout scm
+                // Print the commit being deployed for traceability.
+                sh 'git log -1 --oneline'
+            }
+        }
+
+        stage('Validate Compose') {
+            steps {
+                // Validate the YAML and Compose service configuration before building.
+                sh 'docker compose -f task6/docker-compose.yml config --quiet'
+            }
+        }
+
+        stage('Test Backend') {
+            steps {
+                // Install the exact backend dependencies and run the built-in tests.
+                dir('task6/backend') {
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Build Images') {
+            steps {
+                // Build the frontend image and tag it with this Jenkins build number.
+                sh 'docker build -t $FRONTEND_IMAGE:$IMAGE_TAG -t $FRONTEND_IMAGE:latest task6/frontend'
+                // Build the backend image and tag it with the same build number.
+                sh 'docker build -t $BACKEND_IMAGE:$IMAGE_TAG -t $BACKEND_IMAGE:latest task6/backend'
+            }
+        }
+
+        stage('Push Images') {
+            steps {
+                // Read the Docker Hub username and password/token from Jenkins Credentials.
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
+                    // Log in without placing the token in the shell command history.
+                    sh 'echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin'
+                    // Push the immutable build-number tag for the frontend.
+                    sh 'docker push $FRONTEND_IMAGE:$IMAGE_TAG'
+                    // Push the rolling latest tag for the frontend.
+                    sh 'docker push $FRONTEND_IMAGE:latest'
+                    // Push the immutable build-number tag for the backend.
+                    sh 'docker push $BACKEND_IMAGE:$IMAGE_TAG'
+                    // Push the rolling latest tag for the backend.
+                    sh 'docker push $BACKEND_IMAGE:latest'
+                    // Log out so the agent does not retain an authenticated Docker session.
+                    sh 'docker logout'
+                }
+            }
+        }
+
+        stage('Remove Local Build Images') {
+            steps {
+                // Remove both locally built tags; the registry copies remain available.
+                sh 'docker image rm $FRONTEND_IMAGE:$IMAGE_TAG $FRONTEND_IMAGE:latest $BACKEND_IMAGE:$IMAGE_TAG $BACKEND_IMAGE:latest || true'
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                // Make the image owner and immutable tag available to Compose.
+                withEnv(["DOCKERHUB_USER=$DOCKERHUB_USER", "IMAGE_TAG=$IMAGE_TAG"]) {
+                    // Pull the exact images that were just published to Docker Hub.
+                    sh 'docker compose -f task6/docker-compose.yml pull'
+                    // Start MongoDB, backend and frontend as one application stack.
+                    sh 'docker compose -f task6/docker-compose.yml up -d --remove-orphans'
+                    // Print service state so deployment status is visible in the build log.
+                    sh 'docker compose -f task6/docker-compose.yml ps'
+                }
+            }
+        }
+
+        stage('Smoke Test') {
+            steps {
+                // Verify that the public backend health endpoint responds successfully.
+                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:5000/health'
+                // Verify that the frontend web server responds successfully.
+                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8080/'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Show recent service logs to simplify deployment troubleshooting.
+            sh 'docker compose -f task6/docker-compose.yml logs --tail=50 || true'
+            // Remove only dangling build cache to reclaim space without deleting named data volumes.
+            sh 'docker image prune -f'
+        }
+        success {
+            // Mark the build as successfully deployed.
+            echo 'FoodExpress images pushed and Compose deployment completed.'
+        }
+        failure {
+            // Keep the error visible in Jenkins and the build history.
+            echo 'Task 6 pipeline failed. Review the stage logs before retrying.'
+        }
+    }
+}
