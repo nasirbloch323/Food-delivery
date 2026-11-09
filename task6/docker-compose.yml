@@ -1,0 +1,59 @@
+# Define the services that make up the FoodExpress application.
+services:
+  # The MongoDB database stores customer demo orders.
+  mongo:
+    # Pull the official MongoDB image from Docker Hub.
+    image: mongo:7
+    # Restart the database after host or container restarts.
+    restart: unless-stopped
+    # Keep database files in a named Docker volume.
+    volumes:
+      - mongo_data:/data/db
+    # Check that MongoDB is ready before dependent services start.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # The backend exposes menu and order REST endpoints.
+  backend:
+    # Use the image built and published by the Jenkins pipeline.
+    image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-backend:${IMAGE_TAG:-latest}
+    # Restart the API if it exits unexpectedly.
+    restart: unless-stopped
+    # Provide the database address using Compose's internal DNS name.
+    environment:
+      PORT: 5000
+      MONGO_URL: mongodb://mongo:27017/foodexpress
+    # Publish the API port for local testing and browser access.
+    ports:
+      - "5000:5000"
+    # Wait until the database health check succeeds.
+    depends_on:
+      mongo:
+        condition: service_healthy
+    # Verify the API process is responding before marking it healthy.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # Nginx serves the frontend website to the browser.
+  frontend:
+    # Use the image built and published by Jenkins.
+    image: ${DOCKERHUB_USER:-nasirbloch323}/foodexpress-frontend:${IMAGE_TAG:-latest}
+    # Restart the website container after host restarts.
+    restart: unless-stopped
+    # Publish the website on port 8080 of the EC2 host.
+    ports:
+      - "8080:80"
+    # Start the backend before the frontend.
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# Declare the persistent database volume.
+volumes:
+  mongo_data:
