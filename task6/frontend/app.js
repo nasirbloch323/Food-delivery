@@ -1,5 +1,5 @@
-// Read the backend URL from the container environment; use the Compose service name by default.
-const API_URL = window.API_URL || "http://localhost:5000";
+// Use a relative API path so the browser calls the same host that served the website.
+const API_URL = "";
 // Keep the currently selected food item in browser memory.
 let selectedItem = null;
 // Cache the menu container so it can be updated after the API response.
@@ -10,10 +10,10 @@ const statusPill = document.getElementById("status");
 const orderButton = document.getElementById("order-button");
 const orderMessage = document.getElementById("order-message");
 
-// Load menu data from the backend API.
+// Load menu data from the backend API through the Nginx reverse proxy.
 async function loadMenu() {
   try {
-    // Request the public menu endpoint.
+    // Request the public menu endpoint on the same host.
     const response = await fetch(`${API_URL}/api/foods`);
     // Convert the JSON response into JavaScript data.
     const foods = await response.json();
@@ -42,7 +42,7 @@ async function loadMenu() {
   } catch (error) {
     // Show a useful message when the backend cannot be reached.
     statusPill.textContent = "API unavailable";
-    menuGrid.innerHTML = '<p class="muted">Could not load the menu. Check that the backend and database containers are running.</p>';
+    menuGrid.innerHTML = '<p class="muted">Could not load the menu. Check that all Docker services are healthy.</p>';
     console.error("Menu loading error:", error);
   }
 }
