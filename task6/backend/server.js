@@ -39,7 +39,7 @@ const foods = [
 ];
 
 // Provide a lightweight health endpoint for Docker and load balancers.
-app.get("/health", (request, response) => {
+app.get("/api/health", (request, response) => {
   response.json({ status: "ok", service: "foodexpress-api", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" });
 });
 
