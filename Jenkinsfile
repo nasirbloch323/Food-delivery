@@ -94,11 +94,11 @@ pipeline {
         stage('Smoke Test') {
             steps {
                 // Retry the health endpoint through Nginx until the stack is ready.
-                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8080/api/health'
+                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8081/api/health'
                 // Confirm the frontend responds over the published HTTP port.
-                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8080/'
+                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8081/'
                 // Confirm the menu endpoint is reachable through the frontend proxy.
-                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8080/api/foods'
+                sh 'curl --fail --retry 10 --retry-delay 3 http://localhost:8081/api/foods'
             }
         }
     }
