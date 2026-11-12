@@ -1,29 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-
-*{
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  font-family: Outfit;
-  scroll-behavior: smooth;
-}
-body{
-  min-height: 100vh;
-}
-a{
-  text-decoration: none;
-  color: inherit;
-}
-.app{
-  width: 80%;
-  margin: auto;
-}
-
-@keyframes fadeIn{
-  0%{
-    opacity: 0;
-  }
-  100%{
-    opacity: 1;
-  }
-}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
+:root{font-family:'DM Sans',sans-serif;color:#172d27;background:#fbfaf6;font-synthesis:none;text-rendering:optimizeLegibility;--green:#173f35;--green2:#245b4b;--lime:#d8e8a5;--gold:#e6a84c;--cream:#fbfaf6;--muted:#78847c;--line:#e9e8df}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;scroll-padding-top:100px}body{min-width:320px;min-height:100vh;background:var(--cream);color:#172d27}button,input,textarea,select{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}img{max-width:100%;display:block}.app{width:min(1240px,91%);margin:auto}@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
