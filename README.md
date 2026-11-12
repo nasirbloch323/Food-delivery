@@ -67,7 +67,10 @@ Food-delivery/
 │   └── src/
 ├── backend/                  # Express REST API
 │   ├── Dockerfile
-│   └── src/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   └── server.js
 └── k8s/
     ├── namespace.yaml
     ├── configmap.yaml
