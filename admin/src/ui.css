@@ -1,0 +1,15 @@
+/* MESA admin UI polish */
+.admin-main .add{width:100%;max-width:1000px;margin:0 auto 28px;padding:28px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 35px #173f3508}
+.admin-main .add p{font-size:12px;font-weight:700;color:#53645a}
+.admin-main .add input,.admin-main .add textarea,.admin-main .add select,.admin-main .order-item select{border:1px solid #dfe6dc;border-radius:5px;padding:12px 13px;background:#fcfdfb;color:#17372e;outline:none}
+.admin-main .add input:focus,.admin-main .add textarea:focus,.admin-main .add select:focus{border-color:#245b4b;box-shadow:0 0 0 3px #245b4b16}
+.admin-main .add-btn{background:#173f35;color:#fff;border:0;border-radius:4px;padding:13px 24px;font-weight:800;letter-spacing:.7px}
+.admin-main .add-img-upload img{border:1px dashed #cbd6c8;border-radius:6px;background:#f7f9f4}
+.admin-main .list.add>p,.admin-main .order h3{font-size:20px;color:#173f35;font-weight:800;margin-bottom:18px}
+.admin-main .list-table-format{padding:14px 12px;border-bottom:1px solid #e5e9e1;font-size:12px}
+.admin-main .list-table-format.title{background:#edf3e8;color:#456052;border-radius:4px}
+.admin-main .list-table-format img{border-radius:5px}
+.admin-main .order-list{display:grid;gap:12px}
+.admin-main .order-item{background:#fff;border:1px solid #e5e9e1;border-radius:7px;padding:17px;box-shadow:0 7px 22px #173f3508}
+.admin-main .order-item select{max-width:190px}
+@media(max-width:600px){.admin-main .add{padding:17px}.admin-main .order-item{padding:12px}}
