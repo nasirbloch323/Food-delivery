@@ -10,9 +10,15 @@ MESA is a refreshed full-stack food-delivery application based on the existing M
 
 MESA uses a fresh visual direction: deep forest-green, warm ivory, sage accents and editorial food-brand typography.
 
-- **Customer storefront:** new MESA brand header, responsive hero, category navigation, food cards, cart entry point and redesigned footer.
+- **Customer storefront:** redesigned responsive hero with clear menu CTA, mobile-friendly layout, stronger food-card hierarchy, hover feedback, readable typography and accessible keyboard focus styles. Existing category, cart, login and checkout flows are retained.
 - **Admin console:** MESA operations branding, workspace navigation, inventory/order workflow styling and responsive layout.
 - Existing customer login, cart, order, admin menu and order-management React flows are retained.
+
+## UI and customer ordering experience
+
+The customer journey is designed around a simple path: open the menu → browse food categories → add items to the cart → enter delivery details → complete checkout. The hero call-to-action jumps directly to the food menu. Food cards keep the item name, description, price and add-to-cart control easy to scan. The layout adapts for mobile screens and respects reduced-motion preferences. Actual order completion still depends on a correctly configured backend, database, payment provider and deployment.
+
+For the complete file-by-file explanation in easy Roman Urdu, including Docker commands, every Kubernetes manifest/resource, deployment flow and interview questions, read [Task 10 Complete Interview Guide](docs/INTERVIEW_GUIDE.md).
 
 ## Architecture
 
