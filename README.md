@@ -271,3 +271,10 @@ The Vite development servers proxy `/api` and `/images` to `http://localhost:400
 ## Maintainer
 
 **Nasir Mehmood** · [GitHub @nasirbloch323](https://github.com/nasirbloch323)
+
+
+## Interview preparation
+
+A beginner-friendly, file-by-file Roman Urdu explanation of the application, Dockerfiles, Kubernetes manifests, deployment commands and technical interview questions is available here:
+
+- [Task 10 Complete Interview Guide](docs/INTERVIEW_GUIDE.md)
