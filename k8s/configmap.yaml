@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mesa-config
+  namespace: mesa-food
+data:
+  NODE_ENV: "production"
+  PORT: "4000"
+  MONGO_DB: "food-delivery"
+  UPLOAD_DIR: "/app/uploads"
+  FRONTEND_URL: "http://food.local"
+  # Set VITE_API_URL to an empty string at build time; nginx proxies /api and /images.
