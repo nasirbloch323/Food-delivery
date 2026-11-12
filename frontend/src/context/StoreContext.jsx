@@ -1,106 +1,25 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
 export const StoreContext = createContext(null);
-
-const StoreContextProvider = (props) => {
+const StoreContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
-  const url = "https://food-delivery-backend-5b6g.onrender.com";
+  const url = import.meta.env.VITE_API_URL || "";
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-
   const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
-    if (token) {
-      const response=await axios.post(
-        url + "/api/cart/add",
-        { itemId },
-        { headers: { token } }
-      );
-      if(response.data.success){
-        toast.success("item Added to Cart")
-      }else{
-        toast.error("Something went wrong")
-      }
-    }
+    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    if (token) { const response = await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } }); response.data.success ? toast.success("Item added to basket") : toast.error("Could not update basket"); }
   };
-
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    if (token) {
-      const response= await axios.post(
-        url + "/api/cart/remove",
-        { itemId },
-        { headers: { token } }
-      );
-      if(response.data.success){
-        toast.success("item Removed from Cart")
-      }else{
-        toast.error("Something went wrong")
-      }
-    }
+    setCartItems((prev) => ({ ...prev, [itemId]: Math.max((prev[itemId] || 0) - 1, 0) }));
+    if (token) { const response = await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } }); response.data.success ? toast.success("Item removed from basket") : toast.error("Could not update basket"); }
   };
-
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((product) => product._id === item);
-        totalAmount += itemInfo.price * cartItems[item];
-      }
-    }
-    return totalAmount;
-  };
-
-  const fetchFoodList = async () => {
-    const response = await axios.get(url + "/api/food/list");
-    if (response.data.success) {
-      setFoodList(response.data.data);
-    } else {
-      alert("Error! Products are not fetching..");
-    }
-  };
-
-  const loadCardData = async (token) => {
-    const response = await axios.post(
-      url + "/api/cart/get",
-      {},
-      { headers: { token } }
-    );
-    setCartItems(response.data.cartData);
-  };
-
-  useEffect(() => {
-    async function loadData() {
-      await fetchFoodList();
-      if (localStorage.getItem("token")) {
-        setToken(localStorage.getItem("token"));
-        await loadCardData(localStorage.getItem("token"));
-      }
-    }
-    loadData();
-  }, []);
-
-  const contextValue = {
-    food_list,
-    cartItems,
-    setCartItems,
-    addToCart,
-    removeFromCart,
-    getTotalCartAmount,
-    url,
-    token,
-    setToken,
-  };
-  return (
-    <StoreContext.Provider value={contextValue}>
-      {props.children}
-    </StoreContext.Provider>
-  );
+  const getTotalCartAmount = () => Object.entries(cartItems).reduce((total, [id, quantity]) => { const product = food_list.find((item) => item._id === id); return total + (product ? product.price * quantity : 0); }, 0);
+  const fetchFoodList = async () => { const response = await axios.get(url + "/api/food/list"); if (response.data.success) setFoodList(response.data.data); else toast.error("Unable to load menu"); };
+  const loadCardData = async (currentToken) => { const response = await axios.post(url + "/api/cart/get", {}, { headers: { token: currentToken } }); setCartItems(response.data.cartData || {}); };
+  useEffect(() => { async function loadData() { try { await fetchFoodList(); const savedToken = localStorage.getItem("token"); if (savedToken) { setToken(savedToken); await loadCardData(savedToken); } } catch { toast.error("Could not connect to the food service"); } } loadData(); }, []);
+  const contextValue = { food_list, cartItems, setCartItems, addToCart, removeFromCart, getTotalCartAmount, url, token, setToken };
+  return <StoreContext.Provider value={contextValue}>{children}</StoreContext.Provider>;
 };
 export default StoreContextProvider;
