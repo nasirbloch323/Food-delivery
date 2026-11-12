@@ -1,34 +1,36 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
-import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import "dotenv/config";
 
-// app config
 const app = express();
-const port =process.env.PORT || 4000;
-
-//middlewares
-app.use(express.json());
+const port = process.env.PORT || 4000;
+app.use(express.json({ limit: "2mb" }));
 app.use(cors());
-
-// DB connection
-connectDB();
-
-// api endpoints
 app.use("/api/food", foodRouter);
-app.use("/images", express.static("uploads"));
+app.use("/images", express.static(process.env.UPLOAD_DIR || "uploads"));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 
-app.get("/", (req, res) => {
-  res.send("API Working");
+app.get("/", (_req, res) => res.status(200).send("MESA food service is running"));
+app.get("/health", (_req, res) => {
+  const databaseReady = mongoose.connection.readyState === 1;
+  res.status(databaseReady ? 200 : 503).json({ status: databaseReady ? "ok" : "waiting-for-database", database: mongoose.connection.readyState });
 });
 
-app.listen(port, () => {
-  console.log(`Server Started on port: ${port}`);
-});
+const start = async () => {
+  try {
+    await connectDB();
+    app.listen(port, "0.0.0.0", () => console.log(`MESA API listening on port ${port}`));
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    process.exit(1);
+  }
+};
+start();
